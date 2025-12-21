@@ -10,8 +10,5 @@ Game Chiến hạm (Battleship) multiplayer 2 người, viết bằng Python + P
 - Nguyễn Quốc An
 - Bùi Văn Ý
 
-## Cách chạy
-1. Chạy `python server.py`
-2. Chạy `python client.py` (mở nhiều cửa sổ)
 
 Dự án đang phát triển...
