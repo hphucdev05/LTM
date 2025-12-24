@@ -1,0 +1,22 @@
+# Python cache files (Rác biên dịch)
+__pycache__/
+*.py[cod]
+
+# Virtual Environment (Môi trường ảo)
+venv/
+env/
+.env
+
+# IDE settings (Cấu hình riêng của VS Code/PyCharm)
+.vscode/
+.idea/
+
+# File dữ liệu test (Không nộp file nặng)
+*.mp4
+*.iso
+src/server/server_storage/*
+src/client/downloads/*
+
+# Giữ lại file .gitkeep để Git biết thư mục rỗng cần giữ
+!src/server/server_storage/.gitkeep
+!src/client/downloads/.gitkeep
