@@ -13,3 +13,15 @@ class NetworkClient:
         self.room_id = None
         self.turn = None
         self.msg_queue = []   # Hàng đợi tin nhắn từ server
+
+    #Hàm kết nối tới server
+    def connect(self):
+        try:
+            self.client.connect((SERVER_IP, PORT))
+            self.client.settimeout(None)
+            self.connected = True
+            threading.Thread(target=self.receive_loop, daemon=True).start()
+            return True
+        except Exception as e:
+            print(f"[NET] Connection error: {e}")
+            return False
