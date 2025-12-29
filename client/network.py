@@ -27,7 +27,7 @@ class NetworkClient:
             return False
 
         #Luồng nhận dữ liệu từ server
-        def receive_loop(self):
+    def receive_loop(self):
         buffer = b''     
         while self.connected:
             try:
