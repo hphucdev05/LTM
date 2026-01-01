@@ -1,0 +1,22 @@
+@startuml
+start
+:Client khởi động;
+:Connect to Server (TCP socket);
+if (Kết nối thành công?) then (yes)
+  :Gửi lệnh UPLOAD + filename + size;
+  if (Server READY?) then (yes)
+    repeat
+      :Đọc chunk từ file local;
+      :Gửi chunk + offset;
+      :Nhận ACK từ server;
+    repeat while (Còn chunk?) = yes
+    :Gửi UPLOAD_COMPLETE;
+    :Nhận SUCCESS;
+  else (no)
+    :Thông báo lỗi;
+  endif
+else (no)
+  :Thông báo không kết nối được;
+endif
+stop
+@enduml

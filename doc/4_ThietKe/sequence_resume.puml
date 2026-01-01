@@ -1,0 +1,20 @@
+@startuml
+actor User
+participant "Client" as C
+participant "Server" as S
+
+User -> C: Chọn file Download
+C -> S: LIST_FILES
+S --> C: File list with sizes
+C -> S: DOWNLOAD filename offset (0 nếu mới)
+S --> C: FILE_INFO size
+alt Nếu offset > 0 (resume)
+  S -> S: Seek to offset
+end
+loop Remaining chunks
+  S -> C: SEND_CHUNK data offset
+  C --> S: ACK offset
+  C -> C: Save chunk & update progress
+end
+C --> User: Download complete
+@enduml

@@ -1,0 +1,19 @@
+@startuml
+actor User
+participant "Client" as C
+participant "Server" as S
+
+User -> C: Chọn file & Upload
+C -> S: CONNECT (TCP)
+S --> C: OK
+C -> S: UPLOAD filename size
+S --> C: READY
+
+loop Chunk (e.g. 1MB each)
+  C -> S: SEND_CHUNK data offset
+  S --> C: ACK offset
+end
+C -> S: UPLOAD_COMPLETE
+S --> C: SUCCESS (MD5 check optional)
+S -> S: Save file to storage
+@enduml

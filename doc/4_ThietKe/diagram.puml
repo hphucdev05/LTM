@@ -1,0 +1,20 @@
+@startuml
+left to right direction
+actor "Client (User)" as user
+
+package "File Sharing System" {
+  usecase "Connect to Server" as UC1
+  usecase "View List Files" as UC2
+  usecase "Upload File" as UC3
+  usecase "Download File" as UC4
+  usecase "Resume Download" as UC5
+  usecase "Delete File (optional)" as UC6
+}
+
+user --> UC1
+user --> UC2
+user --> UC3
+user --> UC4
+user --> UC5
+UC4 ..> UC5 : <<extend>>
+@enduml

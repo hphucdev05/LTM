@@ -1,13 +1,19 @@
-# Các hằng số quy định kích thước gói tin
-HEADER_SIZE = 1024
-FORMAT = 'utf-8'
-CHUNK_SIZE = 4096  # 4KB mỗi lần gửi
+import socket
 
-# Các lệnh giao thức
-CMD_LOGIN = "LOGIN"
-CMD_LIST = "LIST"
-CMD_UPLOAD = "UPLOAD"
+# --- CẤU HÌNH MẠNG ---
+HOST = '127.0.0.1'
+PORT = 65432
+FORMAT = 'utf-8'
+
+# --- CẤU HÌNH BUFFER ---
+HEADER_SIZE = 1024
+CHUNK_SIZE = 4096  # 4KB chunk
+
+# --- DANH SÁCH LỆNH ---
+CMD_LOGIN    = "LOGIN"
+CMD_LIST     = "LIST"
+CMD_UPLOAD   = "UPLOAD"
 CMD_DOWNLOAD = "DOWNLOAD"
-CMD_RESUME = "RESUME"
-CMD_EXIT = "EXIT"
+CMD_EXIT     = "EXIT"
+
 SEPARATOR = "|"
