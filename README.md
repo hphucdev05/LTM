@@ -1,26 +1,3 @@
-
-
-### 2. Có nên thêm hình ảnh App không? Thêm như thế nào?
-
-**Trả lời:** **RẤT NÊN**.
-Hình ảnh giúp người chấm (hoặc người xem GitHub) hình dung ngay game của bạn trông như thế nào mà không cần phải chạy code. Nó tăng độ tin cậy và thẩm mỹ cho đồ án lên rất nhiều.
-
-**Vị trí thêm:**
-Thường sẽ thêm vào ngay sau phần **"Tính Năng Nổi Bật"** hoặc tạo một mục riêng tên là **"📸 Hình Ảnh Minh Họa (Screenshots)"**.
-
-**Cách làm:**
-
-1. Tạo một thư mục tên là `screenshots` (hoặc để trong thư mục `docs` như đã bàn trước đó) nằm ở thư mục gốc.
-2. Chụp ảnh màn hình game (Menu, Lúc chơi, Lúc thắng...).
-3. Lưu ảnh vào thư mục đó (ví dụ: `menu.png`, `gameplay.png`).
-4. Dùng cú pháp Markdown để chèn ảnh: `![Mô tả ảnh](đường_dẫn_ảnh)`.
-
----
-
-### 📝 ĐÂY LÀ FILE README.MD HOÀN CHỈNH (Đã update thêm 2 phần trên)
-
-Bạn hãy copy nội dung dưới đây, thay thế tên thật của các bạn vào và tạo thư mục ảnh tương ứng nhé:
-
 ```markdown
 # 🚢 Đại Chiến Hạm Đội (Battleship Warfare)
 
@@ -41,7 +18,7 @@ Một tựa game bắn tàu (Battleship) nhiều người chơi theo thời gian
     * **Vào phòng (Join):** Nhập ID để vào chơi với bạn bè.
     * **Ghép ngẫu nhiên (Random Match):** Tự động tìm đối thủ đang chờ.
 * **Lối chơi (Gameplay):**
-    * Sắp xếp đội hình tàu (Hỗ trợ xoay tàu dọc/ngang).
+    * Sắp xếp đội hình tàu (Hỗ trợ xoay tàu dọc/ngang với phím `R`).
     * Cơ chế bắn theo lượt (Turn-based).
     * Cập nhật trạng thái trúng/trượt/chìm tàu theo thời gian thực.
     * Tự động xử lý khi đối thủ thoát đột ngột (Disconnect handling).
@@ -50,39 +27,41 @@ Một tựa game bắn tàu (Battleship) nhiều người chơi theo thời gian
 
 ## 📸 Hình Ảnh Minh Họa (Screenshots)
 
-*Giao diện Menu chính và Tạo phòng chờ*
-![Menu Game](docs/screenshots/menu.png)
-!
-*Giao diện Đặt tàu và Chiến đấu*
-![Gameplay](docs/screenshots/gameplay.png)
+### 🖥️ Giao diện chính & Phòng chờ
+| Menu Chính | Tạo Phòng Riêng Tư |
+| :---: | :---: |
+| ![Menu Game](docs/screenshots/menu.png) | ![Private Room](docs/screenshots/createroom.png) |
 
-*Giao diện Tìm thấy trận*
-![MatchFound](docs/screenshots/matchfound.png)
+### ⚔️ Gameplay & Trận đấu
+| Tìm Thấy Trận | Giao Diện Chiến Đấu |
+| :---: | :---: |
+| ![Match Found](docs/screenshots/matchfound.png) | ![Gameplay](docs/screenshots/gameplay.png) |
 
-*Giao diện Kết thúc trận
-![Winlose](docs/screenshots/win-lose.png)
-*Giao diện Tạo phòng bạn bè*
-![PrivateRoom](docs/screenshots/create_room.png)
+### 🏆 Kết thúc
+| Kết Quả Thắng/Thua |
+| :---: |
+| ![Win Lose](docs/screenshots/win-lose.png) |
 
+---
 
 ## 📂 Cấu Trúc Dự Án
 
-Dự án được tổ chức theo mô hình module hóa:
+Dự án được tổ chức theo mô hình module hóa chuyên nghiệp:
 
 ```text
-LTM/
-├── client/                 # Thư mục chứa mã nguồn Client
+ltm/
+├── client/                 # Thư mục chứa mã nguồn client
 │   ├── __init__.py         # Khởi tạo package
 │   ├── main.py             # File chạy chính (Vòng lặp game)
 │   ├── ui.py               # Xử lý giao diện, hình ảnh, vẽ màn hình
-│   ├── network.py          # Xử lý kết nối Socket Client
-│   ├── game_logic.py       # Luật chơi, Class Tàu, Check thắng thua
-│   ├── constants.py        # Cấu hình (Màu sắc, IP Server, Kích thước)
-│   └── assets/             # Tài nguyên (Ảnh tàu, Nền, Icon)
-├── docs/                   # Tài liệu & Hình ảnh minh chứng
-├── server.py               # Mã nguồn Server (Chạy độc lập)
-├── requirements.txt        # Các thư viện cần thiết
-└── README.md               # Tài liệu hướng dẫn
+│   ├── network.py          # Xử lý kết nối socket client
+│   ├── game_logic.py       # Luật chơi, class tàu, check thắng thua
+│   ├── constants.py        # Cấu hình (Màu sắc, ip server, kích thước)
+│   └── assets/             # Tài nguyên (Ảnh tàu, nền, icon)
+├── docs/                   # Tài liệu & hình ảnh minh chứng (screenshots)
+├── server.py               # Mã nguồn server (Chạy độc lập)
+├── requirements.txt        # Danh sách thư viện cần thiết
+└── readme.md               # Tài liệu hướng dẫn sử dụng
 
 ```
 
@@ -90,13 +69,13 @@ LTM/
 
 ## 🛠️ Cài Đặt
 
-### 1. Yêu cầu
+### 1. Yêu cầu hệ thống
 
-* Máy tính đã cài đặt Python 3.x.
+* Máy tính đã cài đặt Python 3.10 trở lên.
 
 ### 2. Cài đặt thư viện
 
-Bạn cần cài thư viện `pygame` để chạy Client.
+Bạn cần cài thư viện `pygame` để chạy client:
 
 ```bash
 pip install pygame
@@ -107,41 +86,39 @@ pip install pygame
 
 ## 🎮 Hướng Dẫn Chạy (Quan Trọng)
 
-**LƯU Ý:** Luôn mở Terminal tại **thư mục gốc** của dự án (thư mục chứa file `server.py` và folder `client`).
+**LƯU Ý:** Luôn mở terminal tại **thư mục gốc** của dự án (thư mục `ltm`, nơi chứa file `server.py`).
 
 ### Bước 1: Khởi động Server
 
-Mở một Terminal và chạy lệnh:
+Mở một terminal và chạy lệnh:
 
 ```bash
 python server.py
 
 ```
 
-*Server sẽ bắt đầu lắng nghe tại `0.0.0.0:65432`.*
+*Server sẽ bắt đầu lắng nghe tại `127.0.0.1:65432`.*
 
 ### Bước 2: Khởi động Client (Người chơi)
 
-Mở một Terminal mới (cho Người chơi 1) và chạy lệnh:
+Mở một terminal mới (cho người chơi 1) và chạy lệnh:
 
 ```bash
 python -m client.main
 
 ```
 
-> **⚠️ CẢNH BÁO:** Tuyệt đối **KHÔNG** chạy lệnh `python client/main.py`. Điều này sẽ gây lỗi `ImportError`. Bạn bắt buộc phải dùng cờ `-m` để chạy như một module.
-
-Để giả lập 2 hoặc nhiều người chơi, hãy mở thêm một Terminal nữa và chạy lại lệnh trên.
+> **⚠️ CẢNH BÁO:** Tuyệt đối **KHÔNG** chạy lệnh `python client/main.py`. Điều này sẽ gây lỗi `ImportError`. Bạn bắt buộc phải đứng ở thư mục gốc và dùng cờ `-m` để chạy như một module.
 
 ---
 
-## 🕹️ Cách Chơi
+## 🕹️ Cách Điều Khiển
 
-* **Chuột:** Click để đặt tàu và chọn ô bắn trên bàn cờ địch.
+* **Chuột:** Click để đặt tàu và chọn ô bắn trên bàn cờ đối thủ.
 * **Bàn phím:**
-* Phím `R`: Xoay tàu (Ngang/Dọc) trong giai đoạn xếp tàu.
-* Phím `Backspace`: Xóa ký tự khi nhập ID phòng.
-* Phím `Enter`: Xác nhận vào phòng.
+* Phím **R**: Xoay tàu (Ngang/Dọc) trong giai đoạn xếp tàu.
+* Phím **Backspace**: Xóa ký tự khi nhập mã ID phòng.
+* Phím **Enter**: Xác nhận tham gia phòng chơi.
 
 
 
@@ -151,31 +128,16 @@ python -m client.main
 
 | Vai Trò | Trách Nhiệm Chính | Thành Viên |
 | --- | --- | --- |
-| **Trưởng Nhóm** | Quản lý cấu trúc, ghép code (`main.py`), xử lý luồng game. | **Lê Hoàng Phúc**  |
-| **Giao Diện** | Thiết kế giao diện (`ui.py`), xử lý hình ảnh (`assets`). | **Nguyễn Quốc An**  |
-| **Mạng** | Xử lý Socket (`network.py`), logic Server (`server.py`). | **Huỳnh Minh Quân**  |
-| **Logic** | Xử lý luật chơi (`game_logic.py`), thuật toán check tàu. | **Bùi Văn Ý**  |
-
-
----
-
-## 📝 Khắc Phục Lỗi Thường Gặp
-
-**1. Lỗi `ModuleNotFoundError: No module named 'client'**`
-
-* **Nguyên nhân:** Bạn đang đứng sai thư mục (ví dụ đang đứng trong folder `client`) hoặc chạy sai lệnh.
-* **Khắc phục:** Quay ra thư mục gốc (`cd ..`) và chạy lệnh `python -m client.main`.
-
-**2. Lỗi không kết nối được (Connection Refused)**
-
-* **Nguyên nhân:** Server chưa bật hoặc sai địa chỉ IP.
-* **Khắc phục:** Hãy chắc chắn đã chạy `python server.py` trước. Nếu chơi qua mạng LAN, hãy chỉnh IP trong `client/constants.py` thành IP của máy chủ.
+| **Trưởng Nhóm** | Quản lý cấu trúc, ghép code (`main.py`), xử lý luồng game. | **Lê Hoàng Phúc** |
+| **Giao Diện** | Thiết kế giao diện (`ui.py`), xử lý hình ảnh (`assets`). | **Nguyễn Quốc An** |
+| **Mạng** | Xử lý socket (`network.py`), logic server (`server.py`). | **Huỳnh Minh Quân** |
+| **Logic** | Xử lý luật chơi (`game_logic.py`), thuật toán check tàu. | **Bùi Văn Ý** |
 
 ---
 
 ## 📜 Bản Quyền
 
-Dự án phục vụ mục đích học tập môn Lập trình mạng.
+Dự án được thực hiện nhằm mục đích học tập cho môn học Lập trình mạng.
 
 ```
 
