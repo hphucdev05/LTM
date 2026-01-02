@@ -1,15 +1,12 @@
 import socket
 
-# --- CẤU HÌNH MẠNG ---
 HOST = '127.0.0.1'
 PORT = 65432
 FORMAT = 'utf-8'
 
-# --- CẤU HÌNH BUFFER ---
 HEADER_SIZE = 1024
-CHUNK_SIZE = 4096  # 4KB chunk
+CHUNK_SIZE = 4096 # Nếu file quá lớn (6GB), bạn có thể tăng lên 65536 (64KB) để nhanh hơn
 
-# --- DANH SÁCH LỆNH ---
 CMD_LOGIN    = "LOGIN"
 CMD_LIST     = "LIST"
 CMD_UPLOAD   = "UPLOAD"

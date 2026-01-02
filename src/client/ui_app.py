@@ -2,123 +2,120 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 import threading
 import os
-import core_logic
+import sys
+import time
 
-# Cấu hình giao diện
+# Fix path để nhận diện folder src
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from src.common import protocol
+from src.client import core_logic
+
 ctk.set_appearance_mode("Dark")
 ctk.set_default_color_theme("blue")
 
-class FileTransferApp(ctk.CTk):
+class SecureShareGUI(ctk.CTk):
     def __init__(self):
         super().__init__()
-        self.client_core = core_logic.ClientCore()
-        self.title("SecureShare - Nhóm 4")
-        self.geometry("700x500")
-
-        # --- FRAME 1: KẾT NỐI ---
-        self.frame_connect = ctk.CTkFrame(self)
-        self.frame_connect.pack(pady=10, fill="x", padx=10)
-
-        self.entry_ip = ctk.CTkEntry(self.frame_connect, placeholder_text="IP Server (127.0.0.1)")
-        self.entry_ip.pack(side="left", padx=5, expand=True, fill="x")
-        self.entry_ip.insert(0, "127.0.0.1")
-
-        self.btn_connect = ctk.CTkButton(self.frame_connect, text="Kết nối", command=self.connect_server)
-        self.btn_connect.pack(side="left", padx=5)
-
-        # --- FRAME 2: CHỨC NĂNG ---
-        self.frame_main = ctk.CTkFrame(self)
-        self.frame_main.pack(expand=True, fill="both", padx=10, pady=5)
-
-        # Listbox danh sách file (Dùng Textbox để giả lập vì ctk chưa có Listbox chuẩn)
-        self.lbl_list = ctk.CTkLabel(self.frame_main, text="Danh sách File trên Server:")
-        self.lbl_list.pack(anchor="w", padx=10)
+        self.title("SecureShare Enterprise - Nhóm 4")
+        self.geometry("800x550")
         
-        self.txt_files = ctk.CTkTextbox(self.frame_main, height=200)
-        self.txt_files.pack(fill="x", padx=10, pady=5)
-        self.txt_files.configure(state="disabled")
+        self.client_socket = None
 
-        self.btn_refresh = ctk.CTkButton(self.frame_main, text="Làm mới danh sách", command=self.refresh_list)
-        self.btn_refresh.pack(pady=5)
-
-        # Thanh tiến trình
-        self.progress = ctk.CTkProgressBar(self.frame_main)
-        self.progress.pack(fill="x", padx=10, pady=10)
-        self.progress.set(0)
-
-        # Nút Upload / Download
-        self.frame_actions = ctk.CTkFrame(self.frame_main, fg_color="transparent")
-        self.frame_actions.pack(fill="x", pady=10)
-
-        self.btn_upload = ctk.CTkButton(self.frame_actions, text="Upload File", command=self.upload_action, fg_color="green")
-        self.btn_upload.pack(side="left", padx=20, expand=True)
-
-        self.btn_download = ctk.CTkButton(self.frame_actions, text="Download File (Nhập tên)", command=self.download_action)
-        self.btn_download.pack(side="right", padx=20, expand=True)
+        # --- GIAO DIỆN KẾT NỐI ---
+        self.conn_frame = ctk.CTkFrame(self)
+        self.conn_frame.pack(pady=10, padx=10, fill="x")
         
-        # Ô nhập tên file để download
-        self.entry_filename = ctk.CTkEntry(self.frame_main, placeholder_text="Nhập tên file cần tải...")
-        self.entry_filename.pack(pady=5)
-
-    def log(self, message):
-        print(message) 
-
-    def connect_server(self):
-        ip = self.entry_ip.get()
-        port = 65432
-        success, msg = self.client_core.connect_server(ip, port)
-        if success:
-            messagebox.showinfo("Thành công", msg)
-            self.client_core.login("UserGUI")
-            self.refresh_list()
-        else:
-            messagebox.showerror("Lỗi", msg)
-
-    def refresh_list(self):
-        if not self.client_core.is_connected: return
-        files = self.client_core.get_file_list()
+        self.ip_entry = ctk.CTkEntry(self.conn_frame, placeholder_text="Server IP (127.0.0.1)")
+        self.ip_entry.insert(0, "127.0.0.1")
+        self.ip_entry.pack(side="left", padx=10, pady=10, expand=True, fill="x")
         
-        self.txt_files.configure(state="normal")
-        self.txt_files.delete("1.0", "end")
-        for f in files:
-            self.txt_files.insert("end", f + "\n")
-        self.txt_files.configure(state="disabled")
+        self.conn_btn = ctk.CTkButton(self.conn_frame, text="KẾT NỐI", command=self.connect, fg_color="#1f538d")
+        self.conn_btn.pack(side="left", padx=10)
 
-    def upload_action(self):
-        if not self.client_core.is_connected:
-            messagebox.showwarning("Cảnh báo", "Chưa kết nối Server!")
-            return
-            
-        filepath = filedialog.askopenfilename()
-        if filepath:
-            # Chạy thread để không đơ giao diện
-            threading.Thread(target=self.run_upload, args=(filepath,)).start()
+        # --- KHU VỰC DANH SÁCH FILE ---
+        self.main_frame = ctk.CTkFrame(self)
+        self.main_frame.pack(pady=10, padx=10, fill="both", expand=True)
+        
+        self.label_list = ctk.CTkLabel(self.main_frame, text="DANH SÁCH FILE TRÊN SERVER", font=("Roboto", 16, "bold"))
+        self.label_list.pack(pady=5)
+        
+        self.file_listbox = ctk.CTkTextbox(self.main_frame, height=200)
+        self.file_listbox.pack(pady=5, padx=10, fill="both", expand=True)
+        self.file_listbox.configure(state="disabled")
 
-    def run_upload(self, filepath):
-        self.progress.set(0)
-        res = self.client_core.upload_file(filepath, self.update_progress)
-        messagebox.showinfo("Upload", res)
-        self.refresh_list()
+        self.refresh_btn = ctk.CTkButton(self.main_frame, text="LÀM MỚI DANH SÁCH", command=self.refresh_files)
+        self.refresh_btn.pack(pady=5)
 
-    def download_action(self):
-        if not self.client_core.is_connected: return
-        filename = self.entry_filename.get().strip()
-        if not filename:
-            messagebox.showwarning("Thiếu thông tin", "Vui lòng nhập tên file cần tải!")
-            return
-            
-        save_dir = filedialog.askdirectory()
-        if save_dir:
-             threading.Thread(target=self.run_download, args=(filename, save_dir)).start()
+        # --- THANH TIẾN TRÌNH (PROGRESS) ---
+        self.progress_label = ctk.CTkLabel(self.main_frame, text="Trạng thái: Sẵn sàng")
+        self.progress_label.pack()
+        
+        self.progress_bar = ctk.CTkProgressBar(self.main_frame)
+        self.progress_bar.pack(fill="x", padx=20, pady=5)
+        self.progress_bar.set(0)
 
-    def run_download(self, filename, save_dir):
-        self.progress.set(0)
-        res = self.client_core.download_file(filename, save_dir, self.update_progress)
-        messagebox.showinfo("Download", res)
+        # --- NÚT ĐIỀU KHIỂN ---
+        self.btn_frame = ctk.CTkFrame(self)
+        self.btn_frame.pack(pady=10, padx=10, fill="x")
+        
+        self.upload_btn = ctk.CTkButton(self.btn_frame, text="UPLOAD FILE", fg_color="#28a745", command=self.start_upload)
+        self.upload_btn.pack(side="left", padx=20, pady=10, expand=True)
+        
+        self.download_btn = ctk.CTkButton(self.btn_frame, text="DOWNLOAD FILE", fg_color="#fd7e14", command=self.start_download)
+        self.download_btn.pack(side="left", padx=20, pady=10, expand=True)
 
-    def update_progress(self, val):
-        self.progress.set(val)
+    def connect(self):
+        try:
+            import socket
+            self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.client_socket.connect((self.ip_entry.get(), protocol.PORT))
+            messagebox.showinfo("Thành công", "Đã kết nối tới Server!")
+            self.refresh_files()
+        except Exception as e:
+            messagebox.showerror("Lỗi", f"Không thể kết nối: {e}")
+
+    def refresh_files(self):
+        if not self.client_socket: return
+        files = core_logic.list_files(self.client_socket)
+        self.file_listbox.configure(state="normal")
+        self.file_listbox.delete("1.0", "end")
+        for name, size in files:
+            self.file_listbox.insert("end", f"📄 {name} ({int(size)/(1024*1024):.2f} MB)\n")
+        self.file_listbox.configure(state="disabled")
+
+    def start_upload(self):
+        path = filedialog.askopenfilename()
+        if path:
+            # Chạy thread riêng để không treo UI
+            threading.Thread(target=self.upload_thread, args=(path,), daemon=True).start()
+
+    def upload_thread(self, path):
+        self.upload_btn.configure(state="disabled")
+        # Logic gửi file (tôi sẽ chỉnh lại core_logic một chút để trả về tiến độ cho UI)
+        success, msg = core_logic.upload_file_gui(self.client_socket, path, self.update_progress)
+        self.upload_btn.configure(state="normal")
+        messagebox.showinfo("Kết quả", msg)
+        self.refresh_files()
+
+    def start_download(self):
+        # Hiện popup nhập tên file
+        dialog = ctk.CTkInputDialog(text="Nhập tên file chính xác trên server:", title="Download")
+        filename = dialog.get_input()
+        if filename:
+            save_dir = filedialog.askdirectory()
+            if save_dir:
+                threading.Thread(target=self.download_thread, args=(filename, save_dir), daemon=True).start()
+
+    def download_thread(self, filename, save_dir):
+        self.download_btn.configure(state="disabled")
+        success, msg = core_logic.download_file_gui(self.client_socket, filename, save_dir, self.update_progress)
+        self.download_btn.configure(state="normal")
+        messagebox.showinfo("Kết quả", msg)
+
+    def update_progress(self, percent, speed, current_mb, total_mb):
+        self.progress_bar.set(percent / 100)
+        self.progress_label.configure(text=f"Đang xử lý: {percent:.1f}% | {speed:.2f} MB/s | {current_mb:.1f}/{total_mb:.1f} MB")
 
 if __name__ == "__main__":
-    app = FileTransferApp()
+    app = SecureShareGUI()
     app.mainloop()

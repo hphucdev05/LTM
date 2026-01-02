@@ -2,68 +2,73 @@ import socket
 import os
 import sys
 
-# BƯỚC 1: FIX PATH TRƯỚC (Phải đặt ở đầu tiên, trước các dòng import module dự án)
+# Fix đường dẫn tuyệt đối
 current_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.abspath(os.path.join(current_dir, '..', '..'))
 if root_dir not in sys.path:
     sys.path.insert(0, root_dir)
 
-# BƯỚC 2: IMPORT CÁC MODULE TRONG DỰ ÁN (Dùng đường dẫn đầy đủ từ src)
 from src.common import protocol
-from src.client.core_logic import list_files, upload_file
+from src.client import core_logic
 
-# Lấy thông tin từ file protocol để đồng bộ với Server
-HOST = protocol.HOST 
-PORT = protocol.PORT
+# Thư mục chứa file tải về
+DOWNLOAD_DIR = os.path.join(current_dir, 'downloads')
+if not os.path.exists(DOWNLOAD_DIR): os.makedirs(DOWNLOAD_DIR)
 
 def main():
-    client_socket = None
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client_socket.connect((HOST, PORT))
-        print("✅ Đã kết nối tới server!\n")
+        print("⏳ Đang kết nối tới server...")
+        client.connect((protocol.HOST, protocol.PORT))
+        print("✅ Kết nối thành công!\n")
 
-        # 1. LIST FILE TRƯỚC
-        files = list_files(client_socket)
-        print("Danh sách file trên server (trước upload):")
-        if not files:
-            print("   → Chưa có file nào\n")
-        else:
-            print(f"{'Tên file'.ljust(35)} | Kích thước")
-            print("-" * 50)
-            for name, size in files:
-                print(f"{name.ljust(35)} | {int(size):,} bytes")
+        while True:
+            print(f"\n{'='*10} SECURE SHARE MENU {'='*10}")
+            print("1. Xem danh sách file (List)")
+            print("2. Upload file")
+            print("3. Download file (Có Resume)")
+            print("4. Thoát")
+            choice = input("👉 Chọn chức năng (1-4): ")
 
-        # 2. UPLOAD FILE
-        print("\n=== BẮT ĐẦU UPLOAD ===")
-        # Đường dẫn file test của bạn
-        test_file = r"C:\Users\ASUS\Pictures\z7320949673374_10137dfeb1559233e7590df54a7748ed.jpg"
+            if choice == "1":
+                files = core_logic.list_files(client)
+                print("\n--- FILE TRÊN SERVER ---")
+                if not files: print("(Trống)")
+                else:
+                    print(f"{'Tên file'.ljust(30)} | {'Kích thước'.rjust(15)}")
+                    print("-" * 50)
+                    for name, size in files:
+                        size_str = f"{size/(1024**3):.2f} GB" if size > 1024**3 else f"{size/(1024**2):.2f} MB"
+                        print(f"{name.ljust(30)} | {size_str.rjust(15)}")
 
-        if not os.path.exists(test_file):
-            print(f"❌ Không tìm thấy file tại: {test_file}")
-            print("Vui lòng kiểm tra lại đường dẫn file trong main_client.py")
-        else:
-            success, msg = upload_file(client_socket, test_file)
-            print(f"Kết quả: {msg}")
+            elif choice == "2":
+                path = input("📂 Nhập đường dẫn file cần Upload: ").strip().replace('"', '')
+                if os.path.isfile(path):
+                    print("🚀 Đang upload...")
+                    success, msg = core_logic.upload_file(client, path)
+                    print(f"Kết quả: {msg}")
+                else:
+                    print("❌ File không tồn tại!")
 
-        # 3. REFRESH DANH SÁCH SAU KHI UPLOAD
-        print("\n🔄 Đang refresh danh sách...")
-        files_after = list_files(client_socket)
-        print("Danh sách file trên server (sau upload):")
-        if not files_after:
-            print("   → Vẫn chưa có file nào")
-        else:
-            print(f"{'Tên file'.ljust(35)} | Kích thước")
-            print("-" * 50)
-            for name, size in files_after:
-                print(f"{name.ljust(35)} | {int(size):,} bytes")
+            elif choice == "3":
+                fname = input("📥 Nhập tên file muốn tải (copy từ danh sách): ").strip()
+                if fname:
+                    print(f"🚀 Đang tải về thư mục: {DOWNLOAD_DIR}")
+                    success, msg = core_logic.download_file(client, fname, DOWNLOAD_DIR)
+                    print(f"Kết quả: {msg}")
+                else:
+                    print("❌ Tên file không được để trống")
+
+            elif choice == "4":
+                print("👋 Tạm biệt!")
+                break
+            else:
+                print("❌ Sai cú pháp, chọn lại!")
 
     except Exception as e:
-        print(f"❌ Lỗi: {e}")
+        print(f"\n❌ Lỗi Client: {e}")
     finally:
-        if client_socket:
-            client_socket.close()
-        input("\nNhấn Enter để thoát...")
+        client.close()
 
 if __name__ == "__main__":
     main()
